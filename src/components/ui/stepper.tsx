@@ -1,6 +1,5 @@
 //https://www.material-tailwind.com/docs/react/stepper
 import * as React from "react"
-import { Check, CheckCheckIcon, CheckIcon, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -236,13 +235,23 @@ export const Stepper = React.forwardRef<StepperRef, StepperProps>(
               <React.Fragment key={index}>
                 <StepIndicator
                   index={index}
-                  title={step.props.title}
+                  title={step.props.title || ''}
                   description={step.props.description}
                   isCompleted={index < currentStep}
                   isActive={index === currentStep}
                 />
                 {index < steps.length - 1 && (
-                  <ChevronRight className="text-muted-foreground mx-2" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mx-2 h-5 w-5 text-muted-foreground"
+                    viewBox="0 0 208 456"
+                    fill="currentColor"
+                  >
+                    <path d="M9 388q8 4 15 4q11 0 17-6l162-186L41 14Q26-1 11 12Q-4 29 9 42l137 156L9 354q-13 19 0 34" />
+                  </svg>
+
+
+
                 )}
               </React.Fragment>
             ))}

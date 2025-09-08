@@ -2,15 +2,15 @@
 import * as React from "react"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "./button"
 
 // Context para comunicar entre Stepper y sus hijos
 const StepperVerticalContext = React.createContext({
   currentStep: 0,
   totalSteps: 0,
-  siguiente: () => {},
-  anterior: () => {},
-  irA: (step: number) => {},
+  siguiente: () => { },
+  anterior: () => { },
+  irA: (step: number) => { },
   isFirstStep: false,
   isLastStep: false,
 })
@@ -37,16 +37,16 @@ const StepIndicatorVertical: React.FC<{
     <div className="flex relative">
       {/* Línea vertical */}
       {!isLast && (
-        <div 
+        <div
           className={cn(
             "absolute left-4 top-8 w-0.5 h-16",
-            isCompleted || isActive 
-              ? "bg-primary" 
+            isCompleted || isActive
+              ? "bg-primary"
               : "bg-gray-200"
           )}
         />
       )}
-      
+
       {/* Círculo del step */}
       <div className="relative flex items-start">
         <div
@@ -60,7 +60,7 @@ const StepIndicatorVertical: React.FC<{
           )}
         >
           {isCompleted ? (
-           <svg
+            <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-5 h-5 text-white" // el color lo controlas aquí
               viewBox="0 0 8 8"
@@ -72,7 +72,7 @@ const StepIndicatorVertical: React.FC<{
             <span className="text-sm font-medium">{index + 1}</span>
           )}
         </div>
-        
+
         {/* Contenido del step */}
         <div className="ml-4 pb-8">
           <p
@@ -85,7 +85,7 @@ const StepIndicatorVertical: React.FC<{
           </p>
           {description && (
             <p className={cn(
-              "text-xs mt-1", 
+              "text-xs mt-1",
               isActive || isCompleted ? "text-gray-600" : "text-gray-400"
             )}>
               {description}
@@ -118,7 +118,7 @@ interface StepNextVerticalProps {
 
 export function StepNextVertical({ children = "Siguiente", onClick, disabled = false, className }: StepNextVerticalProps) {
   const { siguiente, isLastStep } = useStepperVertical()
-  
+
   const handleClick = async () => {
     if (onClick) {
       await onClick()
@@ -129,13 +129,15 @@ export function StepNextVertical({ children = "Siguiente", onClick, disabled = f
   }
 
   return (
-    <Button
+    <button
       onClick={handleClick}
       disabled={disabled}
-      className={cn("bg-primary hover:bg-primary/90", className)}
+      className={`px-6 py-2 rounded-lg bg-primary text-white font-semibold flex items-center gap-2 hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed`}
     >
-      {isLastStep ? "Finalizar" : children}
-    </Button>
+      {isLastStep ? "Finalizar" : "Continuar"}
+      <span className="text-lg">→</span>
+    </button>
+
   )
 }
 
@@ -149,7 +151,7 @@ interface StepBackVerticalProps {
 
 export function StepBackVertical({ children = "Anterior", onClick, disabled = false, className }: StepBackVerticalProps) {
   const { anterior, isFirstStep } = useStepperVertical()
-  
+
   const handleClick = async () => {
     if (onClick) {
       await onClick()
@@ -192,14 +194,14 @@ interface StepperVerticalProps {
 export const StepperVertical = React.forwardRef<StepperVerticalRef, StepperVerticalProps>(
   ({ children, defaultStep = 0, onStepChange, className }, ref) => {
     const [currentStep, setCurrentStep] = React.useState(defaultStep)
-    
+
     // Obtener información de los steps de los children
     const steps = React.Children.toArray(children).filter(
       (child): child is React.ReactElement<StepVerticalProps> => {
         return React.isValidElement(child) && child.type === StepVertical
       }
     )
-    
+
     const totalSteps = steps.length
     const isFirstStep = currentStep === 0
     const isLastStep = currentStep === totalSteps - 1
