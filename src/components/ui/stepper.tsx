@@ -1,5 +1,6 @@
 //https://www.material-tailwind.com/docs/react/stepper
 import * as React from "react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -32,48 +33,52 @@ const StepIndicator: React.FC<{
   isActive?: boolean
 }> = ({ title, index, description, isCompleted, isActive }) => {
   return (
-    <div className="flex items-center">
-      <div className="relative flex items-center justify-center">
-        <div
-          className={cn(
-            "w-10 h-10 rounded-full border-2 flex items-center justify-center",
-            isCompleted
-              ? "border-primary bg-primary text-primary-foreground"
-              : isActive
-                ? "border-primary bg-primary text-white"
-                : "border-gray-300 bg-white text-gray-500",
-          )}
-        >
-          {isCompleted ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-white" // el color lo controlas aquí
-              viewBox="0 0 8 8"
-              fill="currentColor"
-            >
-              <path d="M3 7L0 4l1-1l2 2l4-4l1 1" />
-            </svg>
-          ) : (
-            <span className="text-md font-medium">{index + 1}</span>
-          )}
-        </div>
-      </div>
-      <div className="ml-4">
-        <p
-          className={cn(
-            "text-sm font-medium",
-            isActive || isCompleted ? "text-foreground" : "text-muted-foreground"
-          )}
-        >
-          {title}
-        </p>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+    <div className="flex flex-col items-center min-w-[80px] sm:min-w-[120px] px-2">
+      {/* Círculo */}
+      <div
+        className={cn(
+          "w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center",
+          isCompleted
+            ? "border-primary bg-primary text-primary-foreground"
+            : isActive
+            ? "border-primary bg-primary text-white"
+            : "border-gray-300 bg-white text-gray-500"
+        )}
+      >
+        {isCompleted ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+            viewBox="0 0 8 8"
+            fill="currentColor"
+          >
+            <path d="M3 7L0 4l1-1l2 2l4-4l1 1" />
+          </svg>
+        ) : (
+          <span className="text-sm sm:text-md font-medium">{index + 1}</span>
         )}
       </div>
+
+      {/* Título */}
+      <p
+        className={cn(
+          "mt-1 text-xs sm:text-sm font-bold text-center",
+          isActive || isCompleted ? "text-foreground" : "text-muted-foreground"
+        )}
+      >
+        {title}
+      </p>
+
+      {/* Descripción solo en desktop */}
+      {description && (
+        <p className=" text-xs md:text-sm text-muted-foreground text-center">
+          {description}
+        </p>
+      )}
     </div>
   )
 }
+
 
 
 // Componente Step individual
@@ -240,18 +245,9 @@ export const Stepper = React.forwardRef<StepperRef, StepperProps>(
                   isCompleted={index < currentStep}
                   isActive={index === currentStep}
                 />
+                {/* Ocultar flecha en móvil */}
                 {index < steps.length - 1 && (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="mx-2 h-5 w-5 text-muted-foreground"
-                    viewBox="0 0 208 456"
-                    fill="currentColor"
-                  >
-                    <path d="M9 388q8 4 15 4q11 0 17-6l162-186L41 14Q26-1 11 12Q-4 29 9 42l137 156L9 354q-13 19 0 34" />
-                  </svg>
-
-
-
+                  <ChevronRight className="text-muted-foreground mx-2 sm:inline-block hidden" />
                 )}
               </React.Fragment>
             ))}
