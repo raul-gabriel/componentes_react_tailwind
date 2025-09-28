@@ -1,83 +1,137 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 
 interface AccordionProps {
-    titulo: string;
-    abiertoPorDefecto?: boolean;
-    forceOpen?: boolean;
-    className?: string; // <- clase opcional
-    children: ReactNode;
+  titulo: string;
+  forceOpen?: boolean;
+  className?: string;
+  children: ReactNode;
+  defaultOpen?: boolean; // Opción para estado inicial
+  onToggle?: (isOpen: boolean) => void; // Callback opcional para el padre
 }
 
 const Accordion = ({
-    titulo,
-    abiertoPorDefecto = false,
-    forceOpen,
-    className,
-    children,
+  titulo,
+  forceOpen,
+  className,
+  children,
+  defaultOpen = false,
+  onToggle,
 }: AccordionProps) => {
-    const [abiertoInterno, setAbiertoInterno] = useState(abiertoPorDefecto);
+  const [isOpen, setIsOpen] = useState(forceOpen ?? defaultOpen);
+  const lastForceOpen = useRef(forceOpen);
 
-    useEffect(() => {
-        if (forceOpen) {
-            setAbiertoInterno(true);
-        }
-    }, [forceOpen]);
+  // Detecta cambios en forceOpen y los sincroniza
+  useEffect(() => {
+    if (forceOpen !== lastForceOpen.current) {
+      const newState = forceOpen ?? false;
+      setIsOpen(newState);
+      lastForceOpen.current = forceOpen;
+      
+      // Notificar al componente padre del cambio
+      onToggle?.(newState);
+    }
+  }, [forceOpen, onToggle]);
 
-    const toggleAccordion = () => {
-        setAbiertoInterno((prev) => !prev);
-    };
+  const toggleAccordion = () => {
+    setIsOpen((prev) => {
+      const newState = !prev;
+      lastForceOpen.current = undefined; // Prioriza la acción del usuario
+      
+      // Notificar al componente padre del cambio
+      onToggle?.(newState);
+      
+      return newState;
+    });
+  };
 
-    return (
-        <div className={`border border-gray-200 rounded-lg bg-gray-50 overflow-hidden ${className ?? ''}`}>
-            <button
-                onClick={toggleAccordion}
-                type="button"
-                className="w-full flex justify-between items-center px-4 py-3"
-            >
-                <span className="text-md font-extrabold text-primary">{titulo}</span>
-                <span
-                    className={`transform transition-transform duration-300 text-gray-600 ${abiertoInterno ? 'rotate-180' : ''
-                        }`}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-5 h-5 text-gray-500"
-                        viewBox="0 0 24 24"
-                    >
-                        <g fill="none" fillRule="evenodd">
-                            <path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                            <path
-                                fill="currentColor"
-                                d="M13.06 16.06a1.5 1.5 0 0 1-2.12 0l-5.658-5.656a1.5 1.5 0 1 1 2.122-2.121L12 12.879l4.596-4.596a1.5 1.5 0 0 1 2.122 2.12l-5.657 5.658Z"
-                            />
-                        </g>
-                    </svg>
-                </span>
-            </button>
+  return (
+    <div className={`border border-gray-200 rounded-lg bg-gray-50 overflow-hidden transition-all duration-200 ${className ?? ''}`}>
+      <button
+        type="button"
+        onClick={toggleAccordion}
+        className="w-full flex justify-between items-center px-4 py-3 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset transition-colors duration-150"
+        aria-expanded={isOpen}
+        aria-controls="accordion-content"
+      >
+        <span className="text-md font-extrabold text-primary">{titulo}</span>
+        <span
+          className={`transform transition-transform duration-300 text-gray-600 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          aria-hidden="true"
+        >
+         <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5 text-gray-500"
+            viewBox="0 0 24 24"
+          >
+            <g fill="none" fillRule="evenodd">
+              <path d="M24 0v24H0V0z" />
+              <path
+                fill="currentColor"
+                d="M13.06 16.06a1.5 1.5 0 0 1-2.12 0l-5.658-5.656a1.5 1.5 0 1 1 2.122-2.121L12 12.879l4.596-4.596a1.5 1.5 0 0 1 2.122 2.12l-5.657 5.658Z"
+              />
+            </g>
+          </svg>
+        </span>
+      </button>
 
-            {abiertoInterno && (
-                <div className="px-4 py-3 bg-white text-sm text-gray-700 animate-fade-in-down">
-                    {children}
-                </div>
-            )}
+      <div 
+        id="accordion-content"
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 py-3 bg-white text-sm text-gray-700">
+          {children}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Accordion;
 
-
 /*
 
- <Accordion
+1. Formulario con validación
+<Accordion
   titulo={`Viajero #${index + 1}`}
-  forceOpen={!!errors.validacion}
+  forceOpen={!!errors.travelers?.[index]}
   className="mb-6"
 >
 
-contenido
 </Accordion>
 
+
+2. FAQ:
+<Accordion
+  titulo="¿Cómo cancelar?"
+  defaultOpen={false}
+>
+  <p>Respuesta aquí...</p>
+</Accordion>
+
+
+3. Dashboard con métricas:
+<Accordion
+  titulo="Ventas del Mes"
+  defaultOpen={true}
+  className="border-blue-200"
+  onToggle={(isOpen) => console.log('Ventas:', isOpen)}
+>
+  <div>Gráficos y números...</div>
+</Accordion>
+
+
+
+4. Configuración:
+<Accordion
+  titulo="Notificaciones"
+  forceOpen={hasErrors}
+>
+  <div>Checkboxes y switches...</div>
+</Accordion>
 
 */
