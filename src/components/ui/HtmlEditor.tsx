@@ -286,3 +286,37 @@ export function HtmlEditor({
     </div>
   );
 }
+
+
+
+
+
+/* usar de esta forma
+
+  const [descripcion, setDescripcion] = useState('');
+
+  <HtmlEditor
+      label="Descripción del Tour"
+      name="descripcion"
+      value={descripcion}
+      onChange={(html) => setDescripcion(html)}
+      error="" // o tu mensaje de error
+      placeholder="Escribe la descripción aquí..."
+      required={true}
+      disabled={false}
+      minHeight="300px"
+    />
+
+
+con react form
+<HtmlEditor
+                    label="Descripción"
+                    name="descripcion"
+                    value={data.descripcion}
+                    onChange={(html) => setData({ ...data, descripcion: html })}
+                    error={errors.descripcion}
+                    placeholder="Escribe una descripción..."
+                    required
+                    minHeight="300px"
+                />
+*/
